@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# this script uses the gradle-git release task to tag a release
+
+E_BADARGS=13   # Wrong number of arguments passed to script
+
+SPLIT="=================="
+
+if [ "$1" == "--help" ]
+then
+  echo "Usage: `basename $0` release-scope[MAJOR, MINOR, PATCH] release-stage[dev, rc, final]"
+  exit $E_BADARGS
+fi
+
+RELEASE_SCOPE=${1:-"patch"}
+RELEASE_STAGE=${2:-"dev"}
+
+if [ "$RELEASE_STAGE" = "final" ]; then
+  RELEASE_STATUS="true"
+  RELEASE_TASK="release"
+fi
+
+echo $SPLIT
+echo "Release Scope: [$RELEASE_SCOPE]"
+echo "Release Stage: [$RELEASE_STAGE]"
+echo $SPLIT
+
+./gradlew release "-Prelease.scope=$RELEASE_SCOPE" "-Prelease.stage=$RELEASE_STAGE"
+
+buildStatus=$?
+echo -en '\n'
+
+if [ $buildStatus -ne "0" ]; then
+  echo $SPLIT
+  echo "Build complete [ERROR]"
+  exit buildStatus
+fi
+
+echo $SPLIT
+echo "Build complete [SUCCESS]"
