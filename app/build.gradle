@@ -16,3 +16,7 @@ import org.ajoberstar.grgit.Grgit
 release {
   grgit = Grgit.open(project.file('..'))
 }
+
+task printVersion << {
+  println project.version
+}
